@@ -1,0 +1,49 @@
+# Code snippet to fetch data from a private API.
+
+
+from flask_restplus import Resource
+from flask_restplus import reqparse
+from flask import request
+
+
+# Parameters to be passed using a parser
+parser = reqparse.RequestParser()
+parser.add_argument('publicId', type=str, required=False)
+
+# basic authorization to pass the token in the headers
+authorization = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'X-API-KEY'
+    }
+}
+
+# To filter the data based on the model
+class UserDto:
+    api = Namespace('user', authorizations=authorization, description='User related operations')
+
+    user = api.model('user', {
+        'frequency': fields.String(),
+        'assetId': fields.String(),
+    })
+
+
+_fetch_data = UserDto.user
+
+
+# This function contains the logic to fetch the data
+def fetch_data(data):
+    ...
+    return data_from_api
+
+
+@api.route('/')
+class FetchData(Resource):
+    @api.expect(parser, validate=True)
+    @api.marshal_list_with(_fetch_data, envelope='data')
+    def get(self):
+        """List all data"""
+        args = parser.parse_args()
+        return fetch_data(data=args)
+
